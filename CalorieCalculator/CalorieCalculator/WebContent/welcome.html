@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html>
+<link rel="stylesheet" href="submit_javascript.css" />
+<head>
+<meta charset="ISO-8859-1">
+<title>Final Project - Paul Steuer</title>
+</head>
+<body>
+	<h2>Calculate How Many Calories You Need Each Day</h2>
+	<p>The equation used is the Miffln-St. Jeor Equation which
+		calculates your Basal Metabolic Rate (BMR)</p>
+	<p>The activity Factor</p>
+	<ul>
+		<li>1.2: If you are sedentary (little to no exercise)</li>
+		<li>1.4: If you are lightly active (light exercise/sports 1-3
+			days/week)</li>
+		<li>1.6: If you are moderately active (moderate exercise/sports
+			3-5 days/week)</li>
+		<li>1.7: If you are very active (hard exercise/sports 6-7 days a
+			week)</li>
+		<li>1.9: If you are extra active (very hard exercise/sports and
+			physical job or 2x training)</li>
+	</ul>
+	<hr>
+	<br>Height (inches):
+	<input type="text" id="height">
+	<br>Age:
+	<input type="text" id="age">
+	<br>Weight (pounds):
+	<input type="text" id="weight">
+	<br> Select Gender
+	<select id="gender">
+		<option value="male">Male</option>
+		<option value="Female">Female</option>
+	</select>
+	<br> Activity Factor
+	<select id="activity">
+		<option value="1">1</option>
+		<option value="1.1">1.1</option>
+		<option value="1.2">1.2</option>
+		<option value="1.3">1.3</option>
+		<option value="1.4">1.4</option>
+		<option value="1.5">1.5</option>
+		<option value="1.6">1.6</option>
+		<option value="1.7">1.7</option>
+		<option value="1.8">1.8</option>
+		<option value="1.9">1.8</option>
+	</select>
+	<input type="submit" value="Calculate" onclick="fun()"></input>
+	<hr>
+	<h3>Results: You should eat</h3>
+	<h4 id="retDis"></h4>
+</body>
+<script type="text/javascript">
+	function fun() {
+		var h = document.getElementById("height").value;
+		var w = document.getElementById("weight").value;
+		var a = document.getElementById("age").value;
+		var g = document.getElementById("gender").value;
+		var g = document.getElementById("gender").value;
+		var active = document.getElementById("activity").value;
+		var ret = 0;
+		if (g === "male") {
+			ret = caloricIntakeMEN(w, h, a);
+		} else {
+			ret = caloricIntakeFEMALE(w, h, a);
+		}
+		document.getElementById("retDis").innerHTML = (active * ret)
+				+ " Calories/ Day";
+	}
+
+	function caloricIntakeMEN(weight, height, age) {
+		/**
+		 * The Mifflin-St. Jeor equation is gaining popularity among the nutrition
+		 * professionals for accurately estimating caloric needs. The equation is as
+		 * follows: for for males= 10 x (Weight in kg) + 6.25 x (Height in cm) - 5 x
+		 * age + 5. These equations are also multiplied by the same physical
+		 * activity factors to estimate daily caloric needs.
+		 */
+		var wInkg = weight * 0.45;
+		var hInCm = height * 2.54;
+
+		return 10 * wInkg + 6.25 * hInCm - 5 * age + 5;
+
+	}
+	function caloricIntakeFEMALE(weight, height, age) {
+		/*
+		 * females = 10 x (Weight in kg) + 6.25 x (Height in cm) - 5 x age - 161;
+		 */
+		var wInkg = weight * 0.45;
+		var hInCm = height * 2.54;
+		return 10 * wInkg + 6.25 * hInCm - 5 * age - 161;
+	}
+</script>
+</html>
