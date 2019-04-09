@@ -28,7 +28,7 @@
 	<input type="text" id="age">
 	<br>Weight (pounds):
 	<input type="text" id="weight">
-	<br> Select Gender
+	<br> Gender
 	<select id="gender">
 		<option value="male">Male</option>
 		<option value="Female">Female</option>
@@ -44,7 +44,7 @@
 		<option value="1.6">1.6</option>
 		<option value="1.7">1.7</option>
 		<option value="1.8">1.8</option>
-		<option value="1.9">1.8</option>
+		<option value="1.9">1.9</option>
 	</select>
 	<input type="submit" value="Calculate" onclick="fun()"></input>
 	<hr>
@@ -59,13 +59,14 @@
 		var g = document.getElementById("gender").value;
 		var g = document.getElementById("gender").value;
 		var active = document.getElementById("activity").value;
-		var ret = 0;
+		var base = 0;
 		if (g === "male") {
-			ret = caloricIntakeMEN(w, h, a);
+			base = caloricIntakeMEN(w, h, a);
 		} else {
-			ret = caloricIntakeFEMALE(w, h, a);
+			base = caloricIntakeFEMALE(w, h, a);
 		}
-		document.getElementById("retDis").innerHTML = (active * ret)
+		var calories = base * active;
+		document.getElementById("retDis").innerHTML = (calories.toFixed(0))
 				+ " Calories/ Day";
 	}
 
@@ -79,7 +80,6 @@
 		 */
 		var wInkg = weight * 0.45;
 		var hInCm = height * 2.54;
-
 		return 10 * wInkg + 6.25 * hInCm - 5 * age + 5;
 
 	}

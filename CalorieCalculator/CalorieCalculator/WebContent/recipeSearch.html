@@ -3,21 +3,87 @@
 <head>
 <meta charset="ISO-8859-1">
 <title>Search a Recipe</title>
-<script src="Form.js"></script>
 <link rel="stylesheet" href="submit_javascript.css" />
 </head>
 <body>
 	<h1>Congrats! You are on your first step to becoming healthy.</h1>
 	<h3>To find the perfect Recipe for you please enter some follow-on
 		information</h3>
-		
-		
-
+	<p>Lets find a recipe!</p>
+	<hr>
+	<br>What do you want to cook?
+	<input type="text" id="search">
+	<br>Max number of calories:
+	<input type=text id="cal">
+	<br>Number of Ingredients:
+	<input type="text" id="ingred">
+	<br>
+	<input type="submit" value="Find" onclick="find()"></input>
+	<hr>
 	<!--  This is required by Edamam -->
 	<b></b>
 	<script src="https://developer.edamam.com/attribution/badge.js"></script>
 	<div id="edamam-badge" data-color="white"></div>
 	<!--  This is required by Edamam -->
-
+	<p id="d1"></p>
+	<p id ="response"></p>
 </body>
+<script type="text/javascript">
+	function find() {
+		var meal = document.getElementById("search").value;
+		var cal = document.getElementById("cal").value;
+		var ingred = document.getElementById("ingred").value;
+		//var formatted = '{"title": "Fresh Ham Roasted With Rye Bread and Dried Fruit Stuffing"}';
+		makeCorsRequest(meal, cal, ingred);
+		document.getElementById("d1").innerHTML = meal;
+	}
+
+	// Create the XHR object.
+	function createCORSRequest(method, url) {
+		var xhr = new XMLHttpRequest();
+		if ("withCredentials" in xhr) {
+			// XHR for Chrome/Firefox/Opera/Safari.
+			xhr.open(method, url, true);
+		} else if (typeof XDomainRequest != "undefined") {
+			// XDomainRequest for IE.
+			xhr = new XDomainRequest();
+			xhr.open(method, url);
+		} else {
+			// CORS not supported.
+			xhr = null;
+		}
+		return xhr;
+	}
+
+	// Make the actual CORS request.
+	function makeCorsRequest(q, cal, ingred) {
+		var app_id = "d14cc7e2";
+		var app_key = "e3637bd48903a0cb27241254aafdede0";
+		var pre = document.getElementById('response');
+
+		var url = 'https://api.edamam.com/search?app_id='
+				+ app_id + '&app_key=' + app_key+ '&q=' + q + '&calories=' + cal;
+
+		var xhr = createCORSRequest('POST', url);
+		if (!xhr) {
+			alert('CORS not supported');
+			return;
+		}
+
+		// Response handlers.
+		xhr.onload = function() {
+			var text = xhr.responseText;
+			pre.innerHTML = text;
+		};
+
+		xhr.onerror = function() {
+			alert('Woops, there was an error making the request.');
+		};
+
+		pre.innerHTML = 'Loading...';
+		xhr.setRequestHeader('Content-Type', 'application/json');
+		xhr.send(recipe);
+		pre.innerHTML = recipe;
+	}
+</script>
 </html>

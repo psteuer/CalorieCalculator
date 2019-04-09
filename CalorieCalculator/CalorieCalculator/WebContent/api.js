@@ -1,6 +1,7 @@
 /**
  * From the API documentation
  */
+
 // Create the XHR object.
 function createCORSRequest(method, url) {
 	var xhr = new XMLHttpRequest();
