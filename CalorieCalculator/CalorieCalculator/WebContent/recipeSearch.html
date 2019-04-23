@@ -4,38 +4,104 @@
 <meta charset="ISO-8859-1">
 <title>Search a Recipe</title>
 <link rel="stylesheet" href="submit_javascript.css" />
+<style>
+input[type=text] {
+	width: 25%;
+	height: 20px;
+	padding: 5px;
+	margin-bottom: 25px;
+	margin-top: 5px;
+	border: 2px solid #ccc;
+	color: #4f4f4f;
+	font-size: 16px;
+	border-radius: 5px;
+}
+
+* {
+	box-sizing: border-box;
+}
+
+/* Create three equal columns that floats next to each other */
+.column {
+	float: left;
+	width: 33.33%;
+	padding: 10px;
+	height: 300px; /* Should be removed. Only for demonstration */
+}
+
+/* Clear floats after the columns */
+.row:after {
+	content: "";
+	display: table;
+	clear: both;
+}
+</style>
 </head>
 <body>
-	<h1>Congrats! You are on your first step to becoming healthy.</h1>
-	<h3>To find the perfect Recipe for you please enter some follow-on
-		information</h3>
-	<p>Lets find a recipe!</p>
+	<h2>Congrats! You are on your first step to eating healthy.</h2>
+	<h3>Here is your caloric breakdown for a typical day. Following a
+		40%, 30%, 30% breakdown</h3>
+	<p id="id1"></p>
+	<p id="br"></p>
+	<p id="lunch"></p>
+	<p id="dinner"></p>
 	<hr>
-	<br>What do you want to cook?
-	<input type="text" id="search">
-	<br>Max number of calories:
-	<input type=text id="cal">
-	<br>Number of Ingredients:
-	<input type="text" id="ingred">
+	<br>What do you want to cook for breakfast?
+	<input type="text" id="breakfast">
+	<br>What do you want to cook for Lunch?
+	<input type="text" id="lunchSearch">
+	<br>What do you want to cook for Dinner?
+	<input type="text" id="dinnerSearch">
 	<br>
-	<input type="submit" value="Find" onclick="find()"></input>
+	<input type="button" value="Find Recipies!" onclick="find()"></input>
 	<hr>
+
+	<div style="display: none;" id="outcome">
+		<div class="row">
+			<div class="column">
+				<h3 id="bout"></h3>
+				<img height="150" width="150" id=brDescription></img>
+				<p></p>
+				<a id=brLink>Check it out!</a>
+			</div>
+			<div class="column">
+				<h3 id="lout"></h3>
+				<img id=lDescription height="150" width="150"></img>
+				<p></p>
+				<a id=lLink>Check it out!</a>
+			</div>
+			<div class="column">
+				<h3 id="dout"></h3>
+				<img id=dDescription height="150" width="150"></img>
+				<p></p>
+				<a id=dLink>Check it out!</a>
+			</div>
+		</div>
+	</div>
 	<!--  This is required by Edamam -->
 	<b></b>
 	<script src="https://developer.edamam.com/attribution/badge.js"></script>
 	<div id="edamam-badge" data-color="white"></div>
 	<!--  This is required by Edamam -->
-	<p id="d1"></p>
-	<p id ="response"></p>
+
 </body>
 <script type="text/javascript">
 	function find() {
-		var meal = document.getElementById("search").value;
-		var cal = document.getElementById("cal").value;
-		var ingred = document.getElementById("ingred").value;
-		//var formatted = '{"title": "Fresh Ham Roasted With Rye Bread and Dried Fruit Stuffing"}';
-		makeCorsRequest(meal, cal, ingred);
-		document.getElementById("d1").innerHTML = meal;
+		var bfast = document.getElementById("breakfast").value;
+		var bcal = localStorage.getItem("bcal");
+		makeCorsRequest(bfast, bcal, "bout", "brDescription", "brLink");
+
+		var lunch = document.getElementById("lunchSearch").value;
+		var Lcal = localStorage.getItem("Lcals");
+		makeCorsRequest(lunch, Lcal, "lout", "lDescription", "lLink");
+
+		var dinner = document.getElementById("dinnerSearch").value;
+		var dcal = localStorage.getItem("dcals");
+		makeCorsRequest(dinner, dcal, "dout", "dDescription", "dLink");
+
+		//display the output, so it doesn't look like trash
+		document.getElementById('outcome').style.display = "block";
+
 	}
 
 	// Create the XHR object.
@@ -56,13 +122,14 @@
 	}
 
 	// Make the actual CORS request.
-	function makeCorsRequest(q, cal, ingred) {
+	function makeCorsRequest(q, cal, outputId, outDes, outLink) {
 		var app_id = "d14cc7e2";
 		var app_key = "e3637bd48903a0cb27241254aafdede0";
-		var pre = document.getElementById('response');
+		var pre = document.getElementById(outputId);
+		var Ncal = parseFloat(cal).toFixed(0);
 
-		var url = 'https://api.edamam.com/search?app_id='
-				+ app_id + '&app_key=' + app_key+ '&q=' + q + '&calories=' + cal;
+		var url = 'https://api.edamam.com/search?app_id=' + app_id
+				+ '&app_key=' + app_key + '&q=' + q + '&calories=' + Ncal;
 
 		var xhr = createCORSRequest('POST', url);
 		if (!xhr) {
@@ -73,7 +140,14 @@
 		// Response handlers.
 		xhr.onload = function() {
 			var text = xhr.responseText;
-			pre.innerHTML = text;
+			var test = JSON.parse(text);
+			pre.innerHTML = (test.hits[0].recipe.label + " (" + cal + " calories)");
+			var desc = document.getElementById(outDes);
+			desc.src = test.hits[0].recipe.image;
+
+			var link = document.getElementById(outLink);
+			link.href = test.hits[0].recipe.url;
+
 		};
 
 		xhr.onerror = function() {
@@ -82,8 +156,27 @@
 
 		pre.innerHTML = 'Loading...';
 		xhr.setRequestHeader('Content-Type', 'application/json');
-		xhr.send(recipe);
-		pre.innerHTML = recipe;
+		xhr.send();
+	}
+
+	function setText(id, newvalue) {
+		var s = document.getElementById(id);
+		s.innerHTML = newvalue;
+	}
+	window.onload = function() {
+		var calcal = localStorage.getItem("cals");
+		setText(
+				"br",
+				("Breakfast: " + parseFloat(calcal * .40).toFixed(0) + " calories"));
+		localStorage.setItem("bcal", parseFloat(calcal * .40).toFixed(0));
+		setText("lunch",
+				("Lunch: " + parseFloat(calcal * .30).toFixed(0) + " calories"));
+		localStorage.setItem("Lcals", parseFloat(calcal * .30).toFixed(0));
+		setText(
+				"dinner",
+				("Dinner: " + parseFloat(calcal * .30).toFixed(0) + " calories"));
+		localStorage.setItem("dcals", parseFloat(calcal * .30).toFixed(0));
+
 	}
 </script>
 </html>

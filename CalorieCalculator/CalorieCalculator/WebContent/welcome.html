@@ -9,7 +9,7 @@
 	<h2>Calculate How Many Calories You Need Each Day</h2>
 	<p>The equation used is the Miffln-St. Jeor Equation which
 		calculates your Basal Metabolic Rate (BMR)</p>
-	<p>The activity Factor</p>
+	<p>The activity factors:</p>
 	<ul>
 		<li>1.2: If you are sedentary (little to no exercise)</li>
 		<li>1.4: If you are lightly active (light exercise/sports 1-3
@@ -28,12 +28,12 @@
 	<input type="text" id="age">
 	<br>Weight (pounds):
 	<input type="text" id="weight">
-	<br> Gender
+	<br> Gender:
 	<select id="gender">
 		<option value="male">Male</option>
 		<option value="Female">Female</option>
 	</select>
-	<br> Activity Factor
+	<br> Activity Factor:
 	<select id="activity">
 		<option value="1">1</option>
 		<option value="1.1">1.1</option>
@@ -48,15 +48,15 @@
 	</select>
 	<input type="submit" value="Calculate" onclick="fun()"></input>
 	<hr>
-	<h3>Results: You should eat</h3>
-	<h4 id="retDis"></h4>
+	<h4 id="retDis">You should eat...</h4>
+	<input type="submit" value="Find Recipies!"
+		onclick="post('http://localhost:8080/CalorieCalculator/recipeSearch.html', 'POST')"></input>
 </body>
 <script type="text/javascript">
 	function fun() {
 		var h = document.getElementById("height").value;
 		var w = document.getElementById("weight").value;
 		var a = document.getElementById("age").value;
-		var g = document.getElementById("gender").value;
 		var g = document.getElementById("gender").value;
 		var active = document.getElementById("activity").value;
 		var base = 0;
@@ -66,8 +66,9 @@
 			base = caloricIntakeFEMALE(w, h, a);
 		}
 		var calories = base * active;
-		document.getElementById("retDis").innerHTML = (calories.toFixed(0))
-				+ " Calories/ Day";
+		localStorage.setItem("cals", calories.toFixed(0));
+
+		document.getElementById("retDis").innerHTML = ("You should eat " + (calories.toFixed(0)) + " calories/day");
 	}
 
 	function caloricIntakeMEN(weight, height, age) {
@@ -90,6 +91,43 @@
 		var wInkg = weight * 0.45;
 		var hInCm = height * 2.54;
 		return 10 * wInkg + 6.25 * hInCm - 5 * age - 161;
+	}
+	function postIt() {
+		//Lets find some recipies!
+
+	}
+	/**
+	 * sends a request to the specified url from a form. this will change the window location.
+	 * @param {string} path the path to send the post request to
+	 * @param {object} params the paramiters to add to the url
+	 * @param {string} [method=post] the method to use on the form
+	 */
+
+	function post(path, method) {
+		var params = document.getElementById("retDis").innerHTML;
+		//localStorage.setItem("cals", params);
+
+		method = method || "post"; // Set method to post by default if not specified.
+
+		// The rest of this code assumes you are not using a library.
+		// It can be made less wordy if you use one.
+		var form = document.createElement("form");
+		form.setAttribute("method", method);
+		form.setAttribute("action", path);
+		form.setAttribute("id", "bananas")
+		for ( var key in params) {
+			if (params.hasOwnProperty(key)) {
+				var hiddenField = document.createElement("input");
+				hiddenField.setAttribute("type", "hidden");
+				hiddenField.setAttribute("name", "sender");
+				hiddenField.setAttribute("value", params);
+
+				form.appendChild(hiddenField);
+			}
+		}
+
+		document.body.appendChild(form);
+		form.submit();
 	}
 </script>
 </html>
